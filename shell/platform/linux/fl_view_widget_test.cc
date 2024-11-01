@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "flutter/shell/platform/linux/public/flutter_linux/fl_view.h"
+#include "flutter/shell/platform/linux/public/flutter_linux/fl_view_widget.h"
 #include "flutter/shell/platform/embedder/test_utils/proc_table_replacement.h"
 #include "flutter/shell/platform/linux/fl_engine_private.h"
 #include "flutter/shell/platform/linux/testing/fl_test.h"
@@ -10,14 +10,14 @@
 
 #include "gtest/gtest.h"
 
-static void first_frame_cb(FlView* view, gboolean* first_frame_emitted) {
+static void first_frame_cb(FlViewWidget* view, gboolean* first_frame_emitted) {
   *first_frame_emitted = TRUE;
 }
 
-TEST(FlViewTest, GetEngine) {
+TEST(FlViewWidgetTest, GetEngine) {
   flutter::testing::fl_ensure_gtk_init();
   g_autoptr(FlDartProject) project = fl_dart_project_new();
-  FlView* view = fl_view_new(project);
+  FlView* view = fl_view_widget_new(project);
 
   // Check the engine is immediately available (i.e. before the widget is
   // realized).
@@ -25,10 +25,10 @@ TEST(FlViewTest, GetEngine) {
   EXPECT_NE(engine, nullptr);
 }
 
-TEST(FlViewTest, StateUpdateDoesNotHappenInInit) {
+TEST(FlViewWidgetTest, StateUpdateDoesNotHappenInInit) {
   flutter::testing::fl_ensure_gtk_init();
   g_autoptr(FlDartProject) project = fl_dart_project_new();
-  FlView* view = fl_view_new(project);
+  FlView* view = fl_view_widget_new(project);
   // Check that creating a view doesn't try to query the window state in
   // initialization, causing a critical log to be issued.
   EXPECT_EQ(
@@ -38,11 +38,11 @@ TEST(FlViewTest, StateUpdateDoesNotHappenInInit) {
   (void)view;
 }
 
-TEST(FlViewTest, FirstFrameSignal) {
+TEST(FlViewWidgetTest, FirstFrameSignal) {
   flutter::testing::fl_ensure_gtk_init();
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
-  FlView* view = fl_view_new(project);
+  FlView* view = fl_view_widget_new(project);
   gboolean first_frame_emitted = FALSE;
   g_signal_connect(view, "first-frame", G_CALLBACK(first_frame_cb),
                    &first_frame_emitted);
@@ -61,11 +61,11 @@ TEST(FlViewTest, FirstFrameSignal) {
 }
 
 // Check secondary view is registered with engine.
-TEST(FlViewTest, SecondaryView) {
+TEST(FlViewWidgetTest, SecondaryView) {
   flutter::testing::fl_ensure_gtk_init();
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
-  FlView* implicit_view = fl_view_new(project);
+  FlView* implicit_view = fl_view_widget_new(project);
 
   FlEngine* engine = fl_view_get_engine(implicit_view);
   FlutterEngineProcTable* embedder_api = fl_engine_get_embedder_api(engine);
@@ -82,16 +82,16 @@ TEST(FlViewTest, SecondaryView) {
         return kSuccess;
       }));
 
-  FlView* secondary_view = fl_view_new_for_engine(engine);
+  FlView* secondary_view = fl_view_widget_new_for_engine(engine);
   EXPECT_EQ(view_id, fl_view_get_id(secondary_view));
 }
 
 // Check secondary view that fails registration.
-TEST(FlViewTest, SecondaryViewError) {
+TEST(FlViewWidgetTest, SecondaryViewError) {
   flutter::testing::fl_ensure_gtk_init();
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
-  FlView* implicit_view = fl_view_new(project);
+  FlView* implicit_view = fl_view_widget_new(project);
 
   FlEngine* engine = fl_view_get_engine(implicit_view);
   FlutterEngineProcTable* embedder_api = fl_engine_get_embedder_api(engine);
@@ -108,11 +108,11 @@ TEST(FlViewTest, SecondaryViewError) {
 }
 
 // Check views are deregistered on destruction.
-TEST(FlViewTest, ViewDestroy) {
+TEST(FlViewWidgetTest, ViewDestroy) {
   flutter::testing::fl_ensure_gtk_init();
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
-  FlView* implicit_view = fl_view_new(project);
+  FlView* implicit_view = fl_view_widget_new(project);
 
   FlEngine* engine = fl_view_get_engine(implicit_view);
   FlutterEngineProcTable* embedder_api = fl_engine_get_embedder_api(engine);
@@ -125,7 +125,7 @@ TEST(FlViewTest, ViewDestroy) {
         return kSuccess;
       }));
 
-  FlView* secondary_view = fl_view_new_for_engine(engine);
+  FlView* secondary_view = fl_view_widget_new_for_engine(engine);
 
   int64_t implicit_view_id = fl_view_get_id(implicit_view);
   int64_t secondary_view_id = fl_view_get_id(secondary_view);
@@ -141,11 +141,11 @@ TEST(FlViewTest, ViewDestroy) {
 }
 
 // Check views deregistered with errors works.
-TEST(FlViewTest, ViewDestroyError) {
+TEST(FlViewWidgetTest, ViewDestroyError) {
   flutter::testing::fl_ensure_gtk_init();
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
-  FlView* implicit_view = fl_view_new(project);
+  FlView* implicit_view = fl_view_widget_new(project);
 
   FlEngine* engine = fl_view_get_engine(implicit_view);
   FlutterEngineProcTable* embedder_api = fl_engine_get_embedder_api(engine);
@@ -155,7 +155,7 @@ TEST(FlViewTest, ViewDestroyError) {
         return kInvalidArguments;
       }));
 
-  FlView* secondary_view = fl_view_new_for_engine(engine);
+  FlView* secondary_view = fl_view_widget_new_for_engine(engine);
 
   gtk_widget_destroy(GTK_WIDGET(secondary_view));
   gtk_widget_destroy(GTK_WIDGET(implicit_view));

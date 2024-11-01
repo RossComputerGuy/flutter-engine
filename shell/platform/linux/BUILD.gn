@@ -68,6 +68,7 @@ _public_headers = [
   "public/flutter_linux/fl_texture_registrar.h",
   "public/flutter_linux/fl_value.h",
   "public/flutter_linux/fl_view.h",
+  "public/flutter_linux/fl_view_widget.h",
   "public/flutter_linux/flutter_linux.h",
 ]
 
@@ -153,6 +154,7 @@ source_set("flutter_linux_sources") {
     "fl_value.cc",
     "fl_view.cc",
     "fl_view_accessible.cc",
+    "fl_view_widget.cc",
     "fl_window_state_monitor.cc",
     "key_mapping.g.cc",
   ]
@@ -237,7 +239,7 @@ executable("flutter_linux_unittests") {
     "fl_texture_registrar_test.cc",
     "fl_value_test.cc",
     "fl_view_accessible_test.cc",
-    "fl_view_test.cc",
+    "fl_view_widget_test.cc",
     "fl_window_state_monitor_test.cc",
     "key_mapping_test.cc",
     "testing/fl_test.cc",
